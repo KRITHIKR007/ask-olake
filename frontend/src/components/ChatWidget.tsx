@@ -15,6 +15,7 @@ import {
   PanelLeft,
   BookOpen,
   ExternalLink,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -280,6 +281,20 @@ export function ChatWidget() {
     [messages, activeThreadId, handleSend]
   );
 
+  // Check URL query param ?q= on initial load to auto-submit prompt from landing page
+  useEffect(() => {
+    if (typeof window !== "undefined" && isHydrated) {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q");
+      if (q && q.trim()) {
+        window.history.replaceState({}, "", window.location.pathname);
+        setTimeout(() => {
+          handleSend(q.trim());
+        }, 200);
+      }
+    }
+  }, [isHydrated, handleSend]);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-text">
       {/* Full-Height Left Sidebar: Session Cache History */}
@@ -415,6 +430,15 @@ export function ChatWidget() {
 
           {/* Right Action Links */}
           <div className="flex items-center gap-2">
+            <a
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors shadow-2xs"
+              title="Return to Landing Page Overview"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Overview</span>
+            </a>
+
             <a
               href="https://olake.io/docs/"
               target="_blank"

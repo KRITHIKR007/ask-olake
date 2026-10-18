@@ -58,10 +58,10 @@ export function Message({ message, onRetry }: MessageProps) {
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      {/* Assistant Avatar: Official OLake Logo */}
+      {/* Assistant Avatar: Official OLake Logo (Pure logo, no bubble container) */}
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-900/60 p-1.5 shadow-2xs">
-          <img src="/olake-logo.svg" alt="OLake" className="h-5 w-5 object-contain" />
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center pt-0.5">
+          <img src="/olake-logo.svg" alt="OLake" className="h-7 w-7 object-contain" />
         </div>
       )}
 

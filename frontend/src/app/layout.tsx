@@ -20,6 +20,15 @@ export const metadata: Metadata = {
     "CDC",
     "data lakehouse",
   ],
+  icons: {
+    icon: [
+      { url: "/olake-logo.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/olake-logo.svg",
+    apple: "/olake-logo.svg",
+  },
   openGraph: {
     title: "Ask OLake — AI Documentation Assistant",
     description:
@@ -35,7 +44,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="antialiased bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-950 dark:to-gray-900 min-h-screen">
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/olake-logo.svg" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/olake-logo.svg" />
+      </head>
+      <body className="antialiased bg-ambient-mesh min-h-screen text-foreground">
         {children}
       </body>
     </html>

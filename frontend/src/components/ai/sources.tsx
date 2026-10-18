@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ExternalLink, BookOpen, ChevronDown, ChevronUp, CheckCircle2, Globe } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function GithubIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
@@ -33,41 +32,48 @@ export function Sources({ sources, className }: SourcesProps) {
   return (
     <div
       className={cn(
-        "mt-3.5 overflow-hidden rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-900/50 dark:bg-blue-950/20 shadow-2xs transition-all",
+        "mt-3.5 pt-2.5 border-t border-border/60 transition-all",
         className
       )}
     >
-      {/* Header toggle bar */}
+      {/* Header toggle bar - Clean text only, no bubble */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between px-3.5 py-2 text-left text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-blue-100/40 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
+        className="flex w-full items-center justify-between py-1 text-left text-xs transition-colors cursor-pointer group"
       >
         <div className="flex items-center gap-2 min-w-0">
           <BookOpen className="h-3.5 w-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
-          <span className="font-semibold tracking-wider uppercase text-[10.5px] text-blue-950 dark:text-blue-200 shrink-0">
+          <span className="font-bold tracking-wider uppercase text-[10.5px] text-foreground/80 shrink-0">
             Sources
           </span>
-          <Badge variant="brand" className="h-4 px-1.5 text-[9.5px] shrink-0 font-mono">
-            {sources.length}
-          </Badge>
+          <span className="text-blue-600 dark:text-blue-400 font-mono font-bold text-[11px] shrink-0">
+            ({sources.length})
+          </span>
 
-          {/* Collapsed Pill Preview (Perplexity / Claude style) */}
+          {/* Collapsed Clean Text Preview (NO BUBBLE - colored text only) */}
           {!isOpen && (
-            <div className="hidden sm:flex items-center gap-1.5 truncate ml-1">
+            <div className="hidden sm:flex items-center gap-2 truncate ml-2">
               {previewSources.map((url, i) => {
-                const label = url.replace("https://olake.io/docs/", "").replace("https://github.com/datazip-inc/", "").replace(/\/$/, "");
+                const label = url
+                  .replace("https://olake.io/docs/", "")
+                  .replace("https://github.com/datazip-inc/", "")
+                  .replace(/\/$/, "");
                 return (
-                  <span
-                    key={i}
-                    className="truncate max-w-[140px] rounded-md bg-white/80 dark:bg-slate-900/80 px-1.5 py-0.5 text-[10.5px] font-mono text-muted-foreground border border-border/50"
-                  >
-                    {label}
-                  </span>
+                  <React.Fragment key={i}>
+                    {i > 0 && (
+                      <span className="text-muted-foreground/30 text-[10px] select-none">
+                        •
+                      </span>
+                    )}
+                    <span className="truncate max-w-[170px] font-mono text-[11px] font-medium text-blue-600 dark:text-blue-400 group-hover:underline">
+                      {label}
+                    </span>
+                  </React.Fragment>
                 );
               })}
               {remainingCount > 0 && (
-                <span className="text-[10.5px] text-blue-600 dark:text-blue-400 font-medium shrink-0">
+                <span className="text-[11px] text-sky-600 dark:text-sky-400 font-semibold shrink-0 ml-0.5">
                   +{remainingCount} more
                 </span>
               )}
@@ -75,20 +81,20 @@ export function Sources({ sources, className }: SourcesProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-1 text-slate-500 text-[11px] shrink-0 ml-2">
+        <div className="flex items-center gap-1 text-muted-foreground group-hover:text-foreground text-[11px] shrink-0 ml-2 transition-colors">
           <span>{isOpen ? "Hide" : "View"}</span>
           {isOpen ? (
-            <ChevronUp className="h-3.5 w-3.5" />
+            <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
           ) : (
-            <ChevronDown className="h-3.5 w-3.5" />
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
           )}
         </div>
       </button>
 
-      {/* Sources Grid */}
+      {/* Expanded Sources List - Clean text links, no bubble cards */}
       {isOpen && (
-        <div className="border-t border-blue-100/80 dark:border-blue-900/60 p-2.5 bg-card/40 animate-in fade-in-50 duration-150">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="pt-2 pb-1 space-y-1.5 animate-in fade-in-50 duration-150">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
             {sources.map((url, i) => {
               const isGithub = url.includes("github.com");
               const isDocs = url.includes("olake.io");
@@ -97,11 +103,15 @@ export function Sources({ sources, className }: SourcesProps) {
               let sectionBadge = "Documentation";
 
               if (isGithub) {
-                sectionBadge = "GitHub Repo";
-                label = url.replace("https://github.com/datazip-inc/", "").replace("/blob/master/", " / ");
+                sectionBadge = "GitHub";
+                label = url
+                  .replace("https://github.com/datazip-inc/", "")
+                  .replace("/blob/master/", " / ");
               } else if (isDocs) {
-                sectionBadge = "Official Docs";
-                label = url.replace("https://olake.io/docs/", "").replace(/\/$/, "") || "Overview";
+                sectionBadge = "Docs";
+                label =
+                  url.replace("https://olake.io/docs/", "").replace(/\/$/, "") ||
+                  "Overview";
               }
 
               return (
@@ -110,24 +120,24 @@ export function Sources({ sources, className }: SourcesProps) {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col justify-between rounded-lg border border-slate-200/80 bg-white p-2 text-xs transition-all duration-150 hover:border-blue-400 hover:shadow-2xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-blue-500"
+                  className="group flex items-center justify-between py-1 text-xs rounded hover:bg-muted/40 px-1 -mx-1 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-1.5 mb-1">
-                    <div className="flex items-center gap-1.5">
-                      {isGithub ? (
-                        <GithubIcon className="h-3 w-3 text-slate-600 dark:text-slate-400" />
-                      ) : (
-                        <Globe className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                      )}
-                      <span className="text-[9.5px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                        {sectionBadge}
-                      </span>
-                    </div>
-                    <ExternalLink className="h-3 w-3 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+                    {isGithub ? (
+                      <GithubIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    ) : (
+                      <Globe className="h-3.5 w-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                    )}
+                    <span className="font-mono text-[11.5px] font-medium text-blue-600 dark:text-blue-400 group-hover:underline truncate">
+                      {label}
+                    </span>
                   </div>
 
-                  <div className="font-mono text-[11px] font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">
-                    {label}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[10px] font-semibold text-muted-foreground/80 uppercase tracking-wider">
+                      {sectionBadge}
+                    </span>
+                    <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
                   </div>
                 </a>
               );

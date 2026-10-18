@@ -11,10 +11,10 @@ interface EmptyStateProps {
 export function EmptyState({ onSelectPrompt }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-6 sm:py-10 px-3 text-center max-w-2xl mx-auto space-y-6 animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-      {/* Official OG Logo & Brand Header */}
+      {/* Official OG Logo & Brand Header (Pure logo, no bubble container) */}
       <div className="flex flex-col items-center space-y-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/70 dark:border-blue-900/60 p-3 shadow-xs hover:scale-105 transition-transform duration-200">
-          <img src="/olake-logo.svg" alt="OLake" className="h-full w-full object-contain" />
+        <div className="flex items-center justify-center">
+          <img src="/olake-logo.svg" alt="OLake" className="h-14 w-14 object-contain hover:scale-105 transition-transform duration-200" />
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
