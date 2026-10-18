@@ -18,13 +18,34 @@
   <a href="#evaluation--benchmarks"><img src="https://img.shields.io/badge/Benchmark-100%25%20(17%2F17)-success?style=for-the-badge" alt="Benchmark" /></a>
 </p>
 
-> [!NOTE]
-> ### 🌐 Hackathon Submission Endpoints (Live)
-> - **Public API Endpoint**: `POST https://pct-amy-robertson-bucks.trycloudflare.com/ask`
-> - **Public Health Check**: `GET https://pct-amy-robertson-bucks.trycloudflare.com/health`
-> - **Live Web Application**: `https://med-turtle-toll-separately.trycloudflare.com`
-> - **Live Embeddable Chat Widget**: `https://med-turtle-toll-separately.trycloudflare.com/embed`
-> - **GitHub Repository**: [https://github.com/KRITHIKR007/ask-olake](https://github.com/KRITHIKR007/ask-olake)
+> [!IMPORTANT]
+> ### 🏆 Official Submission Deliverables
+>
+> 1. **Publicly Reachable Endpoint**:
+>    - **Method**: `POST`
+>    - **URL**: `https://ask-olake-brown.vercel.app/ask`
+>    - **Request Format**: `{"question": "..."}`
+>    - **Response Format**: `{"answer": "...", "sources": ["<url>", ...]}`
+>    - **Live Health Check**: `GET https://ask-olake-brown.vercel.app/health`
+>
+> 2. **Embeddable Chat UI**:
+>    - **Full-Screen Chat Interface**: [https://ask-olake-brown.vercel.app/chat](https://ask-olake-brown.vercel.app/chat)
+>    - **Embeddable Docs Widget**: [https://ask-olake-brown.vercel.app/embed](https://ask-olake-brown.vercel.app/embed)
+>    - **Landing Page Overview**: [https://ask-olake-brown.vercel.app/](https://ask-olake-brown.vercel.app/)
+>    - **Docs Embed Code**:
+>      ```html
+>      <iframe
+>        src="https://ask-olake-brown.vercel.app/embed"
+>        width="100%"
+>        height="640"
+>        style="border: none; border-radius: 16px;"
+>        title="Ask OLake Documentation Assistant"
+>      ></iframe>
+>      ```
+>
+> 3. **Repository & Architecture Guide**:
+>    - **GitHub Repository**: [https://github.com/KRITHIKR007/ask-olake](https://github.com/KRITHIKR007/ask-olake)
+>    - **Architecture & Design Choices**: Detailed in this README below.
 
 ---
 
@@ -472,7 +493,7 @@ python evaluation/generate_audit_metrics.py
 ```
 To run the live evaluation against any deployed backend:
 ```bash
-python backend/scripts/evaluate_official.py https://pct-amy-robertson-bucks.trycloudflare.com evaluation/live_audit_results.json
+python backend/scripts/evaluate_official.py https://ask-olake-brown.vercel.app evaluation/live_audit_results.json
 ```
 
 ---

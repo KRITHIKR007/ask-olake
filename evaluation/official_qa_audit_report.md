@@ -211,8 +211,9 @@ To ensure that performance improvements on the official suite did not introduce 
      - 0 fabricated URLs (0.0%).
      - All links map to live documentation paths under `https://olake.io/docs/` or authoritative GitHub markdown paths.
 3. **Public Deployment Verification**:
-   - Live public endpoint tested via Cloudflare tunnel: `https://pct-amy-robertson-bucks.trycloudflare.com/ask`.
-   - Live frontend tested via Cloudflare tunnel: `https://med-turtle-toll-separately.trycloudflare.com`.
+   - Live public endpoint tested via Vercel production: `https://ask-olake-brown.vercel.app/ask`.
+   - Live frontend tested via Vercel production: `https://ask-olake-brown.vercel.app`.
+   - Embeddable widget tested via Vercel production: `https://ask-olake-brown.vercel.app/embed`.
    - Query response latency averages 4.62 seconds over cold network execution.
 
 ---
