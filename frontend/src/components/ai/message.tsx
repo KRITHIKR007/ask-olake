@@ -58,10 +58,14 @@ export function Message({ message, onRetry }: MessageProps) {
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      {/* Assistant Avatar: Official OLake Logo (Pure logo, no bubble container) */}
+      {/* Assistant Avatar: Official OLake Chat Bubble Icon */}
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center pt-0.5">
-          <img src="/olake-logo.svg" alt="OLake" className="h-7 w-7 object-contain" />
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center">
+          <img
+            src="/olake-chat-bubble.png"
+            alt="Ask OLake"
+            className="h-8 w-8 object-contain rounded-lg shadow-xs"
+          />
         </div>
       )}
 
