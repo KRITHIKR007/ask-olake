@@ -18,6 +18,14 @@
   <a href="#evaluation--benchmarks"><img src="https://img.shields.io/badge/Benchmark-100%25%20(17%2F17)-success?style=for-the-badge" alt="Benchmark" /></a>
 </p>
 
+> [!NOTE]
+> ### 🌐 Hackathon Submission Endpoints (Live)
+> - **Public API Endpoint**: `POST https://pct-amy-robertson-bucks.trycloudflare.com/ask`
+> - **Public Health Check**: `GET https://pct-amy-robertson-bucks.trycloudflare.com/health`
+> - **Live Web Application**: `https://med-turtle-toll-separately.trycloudflare.com`
+> - **Live Embeddable Chat Widget**: `https://med-turtle-toll-separately.trycloudflare.com/embed`
+> - **GitHub Repository**: [https://github.com/KRITHIKR007/ask-olake](https://github.com/KRITHIKR007/ask-olake)
+
 ---
 
 ## 📑 Table of Contents
