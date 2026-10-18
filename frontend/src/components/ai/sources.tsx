@@ -129,11 +129,6 @@ export function Sources({ sources, className }: SourcesProps) {
                   <div className="font-mono text-[11px] font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">
                     {label}
                   </div>
-
-                  <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-2.5 w-2.5" />
-                    <span>Grounding Evidence</span>
-                  </div>
                 </a>
               );
             })}

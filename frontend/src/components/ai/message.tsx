@@ -5,21 +5,16 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
   User,
-  Layers,
   Copy,
   Check,
   RefreshCw,
   AlertCircle,
   ThumbsUp,
   ThumbsDown,
-  ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { CodeBlock } from "./code-block";
 import { Sources } from "./sources";
-import { Reasoning } from "./reasoning";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessageData {
@@ -59,14 +54,14 @@ export function Message({ message, onRetry }: MessageProps) {
   return (
     <div
       className={cn(
-        "flex w-full gap-3 py-3 transition-colors",
+        "flex w-full gap-3 py-3 animate-in fade-in-50 slide-in-from-bottom-1 duration-200 transition-colors",
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      {/* Assistant Avatar */}
+      {/* Assistant Avatar: Official OLake Logo */}
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/30">
-          <Layers className="h-4 w-4" />
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-900/60 p-1.5 shadow-2xs">
+          <img src="/olake-logo.svg" alt="OLake" className="h-5 w-5 object-contain" />
         </div>
       )}
 
@@ -78,15 +73,10 @@ export function Message({ message, onRetry }: MessageProps) {
         )}
       >
         {/* Author / Timestamp Header */}
-        <div className="mb-1.5 flex items-center gap-2 text-[11px] text-muted-foreground px-1">
+        <div className="mb-1 flex items-center gap-2 text-[11px] text-muted-foreground px-1">
           <span className="font-semibold text-foreground/90">
             {isUser ? "You" : "Ask OLake"}
           </span>
-          {!isUser && (
-            <Badge variant="outline" className="h-4 text-[9px] px-1 font-mono text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900">
-              Grounded AI
-            </Badge>
-          )}
           {message.timestamp && <span className="text-muted-foreground/60">• {message.timestamp}</span>}
         </div>
 
@@ -102,18 +92,15 @@ export function Message({ message, onRetry }: MessageProps) {
           )}
         >
           {message.isLoading ? (
-            <div className="space-y-3.5">
-              <Reasoning isLoading={true} />
-              <div className="flex items-center gap-2 py-2">
-                <div className="flex space-x-1">
-                  <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse [animation-delay:0ms]"></span>
-                  <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse [animation-delay:200ms]"></span>
-                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse [animation-delay:400ms]"></span>
-                </div>
-                <span className="text-xs text-muted-foreground font-mono font-medium tracking-tight">
-                  Synthesizing answer from official documentation...
-                </span>
+            <div className="flex items-center gap-2.5 py-2 text-muted-foreground">
+              <div className="flex space-x-1">
+                <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse [animation-delay:0ms]"></span>
+                <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse [animation-delay:200ms]"></span>
+                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse [animation-delay:400ms]"></span>
               </div>
+              <span className="text-xs text-muted-foreground font-medium">
+                Searching documentation & writing answer...
+              </span>
             </div>
           ) : message.isError ? (
             <div className="space-y-3">
@@ -273,13 +260,13 @@ export function Message({ message, onRetry }: MessageProps) {
 
         {/* Message Actions (Assistant Only - ChatGPT / Claude style) */}
         {!isUser && !message.isLoading && !message.isError && (
-          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 px-1 text-muted-foreground">
+          <div className="mt-1.5 flex items-center justify-between gap-2 px-1 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleCopy}
-                className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 aria-label="Copy response text"
               >
                 {copied ? (
@@ -300,7 +287,7 @@ export function Message({ message, onRetry }: MessageProps) {
                   variant="ghost"
                   size="sm"
                   onClick={onRetry}
-                  className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   aria-label="Regenerate answer"
                 >
                   <RefreshCw className="h-3 w-3" />
@@ -315,7 +302,7 @@ export function Message({ message, onRetry }: MessageProps) {
                   size="sm"
                   onClick={() => handleFeedback("up")}
                   className={cn(
-                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
+                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground cursor-pointer transition-transform active:scale-90",
                     feedback === "up" && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50"
                   )}
                   title="Helpful response"
@@ -328,7 +315,7 @@ export function Message({ message, onRetry }: MessageProps) {
                   size="sm"
                   onClick={() => handleFeedback("down")}
                   className={cn(
-                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
+                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground cursor-pointer transition-transform active:scale-90",
                     feedback === "down" && "text-destructive bg-red-50 dark:bg-red-950/50"
                   )}
                   title="Not helpful"
@@ -337,12 +324,6 @@ export function Message({ message, onRetry }: MessageProps) {
                   <ThumbsDown className="h-3 w-3" />
                 </Button>
               </div>
-            </div>
-
-            {/* Grounding Badge */}
-            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/80">
-              <ShieldCheck className="h-3 w-3 text-emerald-500" />
-              <span>4,586 chunks verified</span>
             </div>
           </div>
         )}
