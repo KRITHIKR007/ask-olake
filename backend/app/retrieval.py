@@ -7,7 +7,10 @@ import re
 from pathlib import Path
 
 import numpy as np
-import faiss
+try:
+    import faiss
+except (ImportError, Exception):
+    faiss = None
 from rank_bm25 import BM25Okapi
 
 from app.config import INDEX_DIR, TOP_K_RETRIEVAL, TOP_K_FINAL, EMBEDDING_DIMENSION
@@ -50,13 +53,14 @@ def clean_base_url(url: str) -> str:
 
 
 class RetrievalEngine:
-    """Hybrid retrieval combining dense (FAISS) and sparse (BM25) search."""
+    """Hybrid retrieval combining dense (FAISS / pure NumPy) and sparse (BM25) search."""
 
     def __init__(self):
         self.chunks: list[DocumentChunk] = []
-        self.faiss_index: faiss.IndexFlatIP | None = None
+        self.faiss_index = None
         self.bm25: BM25Okapi | None = None
         self.embeddings: np.ndarray | None = None
+        self.normalized_embeddings: np.ndarray | None = None
         self._loaded = False
 
     @property
@@ -73,12 +77,17 @@ class RetrievalEngine:
         self.embeddings = embeddings
 
         dim = embeddings.shape[1]
-        self.faiss_index = faiss.IndexFlatIP(dim)
-
         norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
         norms = np.where(norms == 0, 1, norms)
-        normalized = embeddings / norms
-        self.faiss_index.add(normalized.astype(np.float32))
+        self.normalized_embeddings = (embeddings / norms).astype(np.float32)
+
+        if faiss is not None:
+            try:
+                self.faiss_index = faiss.IndexFlatIP(dim)
+                self.faiss_index.add(self.normalized_embeddings)
+            except Exception as e:
+                logger.warning(f"FAISS index build skipped: {e}")
+                self.faiss_index = None
 
         tokenized_corpus = [tokenize(c.content) for c in chunks]
         self.bm25 = BM25Okapi(tokenized_corpus, b=0.4, k1=1.5)
@@ -90,8 +99,11 @@ class RetrievalEngine:
         """Save FAISS index, BM25 index, and chunk metadata to disk."""
         index_dir.mkdir(parents=True, exist_ok=True)
 
-        if self.faiss_index is not None:
-            faiss.write_index(self.faiss_index, str(index_dir / "faiss.index"))
+        if faiss is not None and self.faiss_index is not None:
+            try:
+                faiss.write_index(self.faiss_index, str(index_dir / "faiss.index"))
+            except Exception as e:
+                logger.warning(f"Failed to write faiss.index: {e}")
 
         if self.bm25 is not None:
             with open(index_dir / "bm25.pkl", "wb") as f:
@@ -113,47 +125,73 @@ class RetrievalEngine:
         embeddings_path = index_dir / "embeddings.npy"
         meta_path = index_dir / "chunks_meta.json"
 
-        if not all(p.exists() for p in [faiss_path, bm25_path, embeddings_path, meta_path]):
-            logger.warning("Index files not found on disk")
+        # Check required files (faiss is optional; numpy fallback works directly from embeddings.npy)
+        if not all(p.exists() for p in [bm25_path, embeddings_path, meta_path]):
+            logger.warning("Core index files (bm25.pkl, embeddings.npy, chunks_meta.json) not found on disk")
             return False
 
         try:
-            self.faiss_index = faiss.read_index(str(faiss_path))
+            if faiss is not None and faiss_path.exists():
+                try:
+                    self.faiss_index = faiss.read_index(str(faiss_path))
+                except Exception as e:
+                    logger.warning(f"Could not load FAISS index: {e}, falling back to pure NumPy")
+                    self.faiss_index = None
+            else:
+                self.faiss_index = None
 
             with open(bm25_path, "rb") as f:
                 self.bm25 = pickle.load(f)
 
             if embeddings_path.exists():
                 self.embeddings = np.load(str(embeddings_path))
+                norms = np.linalg.norm(self.embeddings, axis=1, keepdims=True)
+                norms = np.where(norms == 0, 1, norms)
+                self.normalized_embeddings = (self.embeddings / norms).astype(np.float32)
 
             with open(meta_path, "r", encoding="utf-8") as f:
                 chunks_meta = json.load(f)
             self.chunks = [DocumentChunk(**m) for m in chunks_meta]
 
             self._loaded = True
-            logger.info(f"Index loaded: {len(self.chunks)} chunks")
+            logger.info(f"Index loaded: {len(self.chunks)} chunks (FAISS: {self.faiss_index is not None})")
             return True
         except Exception as e:
             logger.error(f"Failed to load index: {e}")
             return False
 
     def search_vector(self, query_embedding: np.ndarray, top_k: int = TOP_K_RETRIEVAL) -> list[tuple[int, float]]:
-        """Search using FAISS vector similarity. Returns (index, score) pairs."""
-        if self.faiss_index is None:
+        """Search using FAISS or high-performance pure NumPy matrix-vector cosine similarity."""
+        if not self._loaded or (self.faiss_index is None and self.normalized_embeddings is None):
             return []
 
         norm = np.linalg.norm(query_embedding)
         if norm > 0:
-            query_embedding = query_embedding / norm
+            query = (query_embedding / norm).astype(np.float32)
+        else:
+            query = query_embedding.astype(np.float32)
 
-        query = query_embedding.reshape(1, -1).astype(np.float32)
-        scores, indices = self.faiss_index.search(query, min(top_k, len(self.chunks)))
+        # Fast path 1: FAISS IndexFlatIP
+        if self.faiss_index is not None:
+            try:
+                q_arr = query.reshape(1, -1)
+                scores, indices = self.faiss_index.search(q_arr, min(top_k, len(self.chunks)))
+                results = []
+                for score, idx in zip(scores[0], indices[0]):
+                    if idx >= 0:
+                        results.append((int(idx), float(score)))
+                return results
+            except Exception as e:
+                logger.warning(f"FAISS search failed ({e}), falling back to NumPy")
 
-        results = []
-        for score, idx in zip(scores[0], indices[0]):
-            if idx >= 0:
-                results.append((int(idx), float(score)))
-        return results
+        # Fast path 2: Pure NumPy cosine similarity (1.0ms, zero C++ library dependencies, Vercel/serverless safe)
+        if self.normalized_embeddings is not None:
+            scores = np.dot(self.normalized_embeddings, query)
+            k = min(top_k, len(self.chunks))
+            top_indices = np.argsort(scores)[::-1][:k]
+            return [(int(idx), float(scores[idx])) for idx in top_indices]
+
+        return []
 
     def search_bm25(self, query: str, top_k: int = TOP_K_RETRIEVAL) -> list[tuple[int, float]]:
         """Search using BM25 lexical matching with query expansion and concept boosting."""

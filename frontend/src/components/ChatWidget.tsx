@@ -16,7 +16,7 @@ export function ChatWidget() {
   const [systemInfo, setSystemInfo] = useState<{
     loaded: boolean;
     chunks: number;
-  }>({ loaded: true, chunks: 97 });
+  }>({ loaded: true, chunks: 4586 });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

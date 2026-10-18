@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const backendBase = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+    const backendBase = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
     const targetUrl = new URL("/health", backendBase);
 
     const response = await fetch(targetUrl);

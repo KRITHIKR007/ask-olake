@@ -55,7 +55,7 @@ export function Reasoning({ isLoading = false, className }: ReasoningProps) {
         <div className="mt-2.5 space-y-1.5 border-t border-slate-200/80 pt-2 text-[11px] text-muted-foreground dark:border-slate-800 font-mono">
           <div className="flex items-center gap-2">
             <Database className="h-3 w-3 text-blue-500" />
-            <span>Multi-source index: 97 documentation & repository chunks</span>
+            <span>Multi-source index: 4,586 documentation & repository chunks</span>
           </div>
           <div className="flex items-center gap-2">
             <Cpu className="h-3 w-3 text-emerald-500" />
