@@ -23,34 +23,60 @@ interface SourcesProps {
 }
 
 export function Sources({ sources, className }: SourcesProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!sources || sources.length === 0) return null;
+
+  const previewSources = sources.slice(0, 2);
+  const remainingCount = Math.max(0, sources.length - 2);
 
   return (
     <div
       className={cn(
-        "mt-4 overflow-hidden rounded-xl border border-blue-100 bg-blue-50/50 dark:border-blue-950/60 dark:bg-blue-950/20 shadow-xs",
+        "mt-3.5 overflow-hidden rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-900/50 dark:bg-blue-950/20 shadow-2xs transition-all",
         className
       )}
     >
-      {/* Header toggle */}
+      {/* Header toggle bar */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-blue-100/40 dark:hover:bg-blue-900/30 transition-colors"
+        className="flex w-full items-center justify-between px-3.5 py-2 text-left text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-blue-100/40 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
       >
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-          <span className="font-semibold tracking-wide uppercase text-[11px] text-blue-900 dark:text-blue-200">
-            Verified Documentation Sources
+        <div className="flex items-center gap-2 min-w-0">
+          <BookOpen className="h-3.5 w-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+          <span className="font-semibold tracking-wider uppercase text-[10.5px] text-blue-950 dark:text-blue-200 shrink-0">
+            Sources
           </span>
-          <Badge variant="brand" className="h-4.5 px-1.5 text-[10px]">
+          <Badge variant="brand" className="h-4 px-1.5 text-[9.5px] shrink-0 font-mono">
             {sources.length}
           </Badge>
+
+          {/* Collapsed Pill Preview (Perplexity / Claude style) */}
+          {!isOpen && (
+            <div className="hidden sm:flex items-center gap-1.5 truncate ml-1">
+              {previewSources.map((url, i) => {
+                const label = url.replace("https://olake.io/docs/", "").replace("https://github.com/datazip-inc/", "").replace(/\/$/, "");
+                return (
+                  <span
+                    key={i}
+                    className="truncate max-w-[140px] rounded-md bg-white/80 dark:bg-slate-900/80 px-1.5 py-0.5 text-[10.5px] font-mono text-muted-foreground border border-border/50"
+                  >
+                    {label}
+                  </span>
+                );
+              })}
+              {remainingCount > 0 && (
+                <span className="text-[10.5px] text-blue-600 dark:text-blue-400 font-medium shrink-0">
+                  +{remainingCount} more
+                </span>
+              )}
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-1 text-slate-500 text-[11px]">
-          <span>{isOpen ? "Hide" : "Show"}</span>
+
+        <div className="flex items-center gap-1 text-slate-500 text-[11px] shrink-0 ml-2">
+          <span>{isOpen ? "Hide" : "View"}</span>
           {isOpen ? (
             <ChevronUp className="h-3.5 w-3.5" />
           ) : (
@@ -61,7 +87,7 @@ export function Sources({ sources, className }: SourcesProps) {
 
       {/* Sources Grid */}
       {isOpen && (
-        <div className="border-t border-blue-100/80 dark:border-blue-950/80 p-2.5">
+        <div className="border-t border-blue-100/80 dark:border-blue-900/60 p-2.5 bg-card/40 animate-in fade-in-50 duration-150">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {sources.map((url, i) => {
               const isGithub = url.includes("github.com");
@@ -84,16 +110,16 @@ export function Sources({ sources, className }: SourcesProps) {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col justify-between rounded-lg border border-slate-200/80 bg-white p-2.5 text-xs transition-all duration-150 hover:border-blue-400 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-blue-500"
+                  className="group flex flex-col justify-between rounded-lg border border-slate-200/80 bg-white p-2 text-xs transition-all duration-150 hover:border-blue-400 hover:shadow-2xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-blue-500"
                 >
-                  <div className="flex items-start justify-between gap-1.5 mb-1.5">
+                  <div className="flex items-start justify-between gap-1.5 mb-1">
                     <div className="flex items-center gap-1.5">
                       {isGithub ? (
-                        <GithubIcon className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                        <GithubIcon className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       ) : (
-                        <Globe className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                        <Globe className="h-3 w-3 text-blue-600 dark:text-blue-400" />
                       )}
-                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      <span className="text-[9.5px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         {sectionBadge}
                       </span>
                     </div>

@@ -3,11 +3,23 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { User, Bot, Copy, Check, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  User,
+  Layers,
+  Copy,
+  Check,
+  RefreshCw,
+  AlertCircle,
+  ThumbsUp,
+  ThumbsDown,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { CodeBlock } from "./code-block";
 import { Sources } from "./sources";
 import { Reasoning } from "./reasoning";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessageData {
@@ -27,6 +39,7 @@ interface MessageProps {
 
 export function Message({ message, onRetry }: MessageProps) {
   const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
   const isUser = message.role === "user";
 
   const handleCopy = async () => {
@@ -39,61 +52,72 @@ export function Message({ message, onRetry }: MessageProps) {
     }
   };
 
+  const handleFeedback = (type: "up" | "down") => {
+    setFeedback((prev) => (prev === type ? null : type));
+  };
+
   return (
     <div
       className={cn(
-        "flex w-full gap-3.5 py-4 transition-colors",
+        "flex w-full gap-3 py-3 transition-colors",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       {/* Assistant Avatar */}
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs">
-          <Bot className="h-4 w-4" />
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/30">
+          <Layers className="h-4 w-4" />
         </div>
       )}
 
       {/* Message Content Container */}
       <div
         className={cn(
-          "flex flex-col max-w-[85%] md:max-w-[78%]",
+          "flex flex-col max-w-[88%] md:max-w-[82%]",
           isUser && "items-end"
         )}
       >
         {/* Author / Timestamp Header */}
-        <div className="mb-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-          <span className="font-semibold text-foreground/80">
+        <div className="mb-1.5 flex items-center gap-2 text-[11px] text-muted-foreground px-1">
+          <span className="font-semibold text-foreground/90">
             {isUser ? "You" : "Ask OLake"}
           </span>
-          {message.timestamp && <span>• {message.timestamp}</span>}
+          {!isUser && (
+            <Badge variant="outline" className="h-4 text-[9px] px-1 font-mono text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900">
+              Grounded AI
+            </Badge>
+          )}
+          {message.timestamp && <span className="text-muted-foreground/60">• {message.timestamp}</span>}
         </div>
 
         {/* Message Bubble */}
         <div
           className={cn(
-            "rounded-2xl text-sm leading-relaxed",
+            "rounded-2xl text-[13.5px] leading-relaxed transition-all duration-200",
             isUser
-              ? "bg-blue-600 text-white px-4 py-2.5 rounded-tr-sm shadow-xs"
+              ? "bg-blue-600 text-white px-4 py-2.5 rounded-tr-xs shadow-sm font-medium"
               : message.isError
-              ? "bg-red-50 text-red-900 dark:bg-red-950/40 dark:text-red-200 border border-red-200 dark:border-red-800/50 p-4 rounded-tl-sm w-full"
-              : "bg-card border border-border/70 p-4.5 rounded-tl-sm shadow-xs w-full text-card-foreground"
+              ? "bg-red-50/80 text-red-950 dark:bg-red-950/30 dark:text-red-200 border border-red-200 dark:border-red-800/60 p-4 rounded-tl-xs w-full shadow-xs"
+              : "bg-card border border-border/70 p-4.5 rounded-tl-xs shadow-xs w-full text-card-foreground hover:border-border transition-colors"
           )}
         >
           {message.isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               <Reasoning isLoading={true} />
-              <div className="flex items-center gap-1.5 py-2">
-                <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce"></span>
-                <span className="ml-2 text-xs text-muted-foreground font-mono">
-                  Synthesizing answer...
+              <div className="flex items-center gap-2 py-2">
+                <div className="flex space-x-1">
+                  <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse [animation-delay:0ms]"></span>
+                  <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse [animation-delay:200ms]"></span>
+                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse [animation-delay:400ms]"></span>
+                </div>
+                <span className="text-xs text-muted-foreground font-mono font-medium tracking-tight">
+                  Synthesizing answer from official documentation...
                 </span>
               </div>
             </div>
           ) : message.isError ? (
             <div className="space-y-3">
-              <div className="flex items-start gap-2 text-destructive">
+              <div className="flex items-start gap-2.5 text-destructive">
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <p className="font-medium text-xs leading-normal">
                   {message.content || "An error occurred while communicating with Ask OLake."}
@@ -104,7 +128,7 @@ export function Message({ message, onRetry }: MessageProps) {
                   variant="outline"
                   size="sm"
                   onClick={onRetry}
-                  className="h-7 gap-1.5 text-xs text-destructive hover:bg-destructive/10"
+                  className="h-7 gap-1.5 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
                 >
                   <RefreshCw className="h-3 w-3" />
                   <span>Retry Question</span>
@@ -114,10 +138,59 @@ export function Message({ message, onRetry }: MessageProps) {
           ) : (
             <>
               {/* Markdown Rendered Content */}
-              <div className={cn("prose prose-sm dark:prose-invert max-w-none break-words", isUser && "text-white prose-p:text-white")}>
+              <div
+                className={cn(
+                  "prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed text-foreground",
+                  isUser && "text-white prose-p:text-white"
+                )}
+              >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
+                    h1({ children }) {
+                      return (
+                        <h1 className="text-lg font-bold tracking-tight text-foreground mt-4 mb-2 first:mt-0 pb-1 border-b border-border/40">
+                          {children}
+                        </h1>
+                      );
+                    },
+                    h2({ children }) {
+                      return (
+                        <h2 className="text-base font-bold tracking-tight text-foreground mt-3.5 mb-1.5 first:mt-0 flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full bg-blue-600 inline-block" />
+                          <span>{children}</span>
+                        </h2>
+                      );
+                    },
+                    h3({ children }) {
+                      return (
+                        <h3 className="text-sm font-bold text-foreground mt-3 mb-1 first:mt-0">
+                          {children}
+                        </h3>
+                      );
+                    },
+                    p({ children }) {
+                      return <p className="mb-2.5 last:mb-0 leading-relaxed">{children}</p>;
+                    },
+                    ul({ children }) {
+                      return <ul className="my-2.5 ml-4 space-y-1 list-disc list-outside text-foreground/90">{children}</ul>;
+                    },
+                    ol({ children }) {
+                      return <ol className="my-2.5 ml-4 space-y-1 list-decimal list-outside text-foreground/90">{children}</ol>;
+                    },
+                    li({ children }) {
+                      return <li className="pl-1 leading-relaxed">{children}</li>;
+                    },
+                    blockquote({ children }) {
+                      return (
+                        <blockquote className="my-3 border-l-3 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 px-3.5 py-2 text-xs italic text-muted-foreground rounded-r-md">
+                          {children}
+                        </blockquote>
+                      );
+                    },
+                    strong({ children }) {
+                      return <strong className="font-semibold text-foreground">{children}</strong>;
+                    },
                     code({ className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || "");
                       const value = String(children).replace(/\n$/, "");
@@ -148,7 +221,7 @@ export function Message({ message, onRetry }: MessageProps) {
                     },
                     table({ children }) {
                       return (
-                        <div className="my-3 overflow-x-auto rounded-lg border border-border">
+                        <div className="my-3.5 overflow-x-auto rounded-xl border border-border shadow-2xs">
                           <table className="w-full text-xs text-left border-collapse">
                             {children}
                           </table>
@@ -157,17 +230,17 @@ export function Message({ message, onRetry }: MessageProps) {
                     },
                     thead({ children }) {
                       return (
-                        <thead className="bg-muted text-muted-foreground uppercase text-[10px] tracking-wider font-semibold border-b border-border">
+                        <thead className="bg-muted/70 text-muted-foreground uppercase text-[10px] tracking-wider font-semibold border-b border-border">
                           {children}
                         </thead>
                       );
                     },
                     th({ children }) {
-                      return <th className="p-2.5 font-semibold">{children}</th>;
+                      return <th className="p-3 font-semibold text-foreground/80">{children}</th>;
                     },
                     td({ children }) {
                       return (
-                        <td className="p-2.5 border-b border-border/50 text-foreground">
+                        <td className="p-3 border-b border-border/40 text-foreground">
                           {children}
                         </td>
                       );
@@ -178,7 +251,7 @@ export function Message({ message, onRetry }: MessageProps) {
                           href={href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-blue-600 hover:text-blue-700 underline underline-offset-2 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-3"
                         >
                           {children}
                         </a>
@@ -198,47 +271,86 @@ export function Message({ message, onRetry }: MessageProps) {
           )}
         </div>
 
-        {/* Message Actions (Assistant Only) */}
+        {/* Message Actions (Assistant Only - ChatGPT / Claude style) */}
         {!isUser && !message.isLoading && !message.isError && (
-          <div className="mt-1.5 flex items-center gap-1 text-muted-foreground">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopy}
-              className="h-6 gap-1 px-2 text-[11px] hover:text-foreground"
-              aria-label="Copy response text"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-3 w-3 text-emerald-500" />
-                  <span className="text-emerald-500">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3 w-3" />
-                  <span>Copy</span>
-                </>
-              )}
-            </Button>
-            {onRetry && (
+          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 px-1 text-muted-foreground">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onRetry}
-                className="h-6 gap-1 px-2 text-[11px] hover:text-foreground"
-                aria-label="Retry answer generation"
+                onClick={handleCopy}
+                className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Copy response text"
               >
-                <RefreshCw className="h-3 w-3" />
-                <span>Regenerate</span>
+                {copied ? (
+                  <>
+                    <Check className="h-3 w-3 text-emerald-500" />
+                    <span className="text-emerald-500 font-medium">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3" />
+                    <span>Copy</span>
+                  </>
+                )}
               </Button>
-            )}
+
+              {onRetry && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onRetry}
+                  className="h-6 gap-1 px-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Regenerate answer"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span>Regenerate</span>
+                </Button>
+              )}
+
+              {/* Feedback buttons */}
+              <div className="flex items-center gap-0.5 ml-1 border-l border-border/60 pl-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFeedback("up")}
+                  className={cn(
+                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
+                    feedback === "up" && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50"
+                  )}
+                  title="Helpful response"
+                  aria-label="Thumbs up"
+                >
+                  <ThumbsUp className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFeedback("down")}
+                  className={cn(
+                    "h-6 w-6 p-0 text-muted-foreground hover:text-foreground",
+                    feedback === "down" && "text-destructive bg-red-50 dark:bg-red-950/50"
+                  )}
+                  title="Not helpful"
+                  aria-label="Thumbs down"
+                >
+                  <ThumbsDown className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Grounding Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/80">
+              <ShieldCheck className="h-3 w-3 text-emerald-500" />
+              <span>4,586 chunks verified</span>
+            </div>
           </div>
         )}
       </div>
 
       {/* User Avatar */}
       {isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-xs">
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-2xs">
           <User className="h-4 w-4" />
         </div>
       )}

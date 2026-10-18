@@ -16,24 +16,24 @@ function GithubIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-between min-h-screen bg-background p-3 sm:p-5 lg:p-6 text-foreground">
+    <main className="flex flex-col items-center justify-between h-screen w-full bg-slate-50 dark:bg-slate-950 p-2 sm:p-4 text-foreground overflow-hidden">
       {/* Top Header Bar */}
-      <header className="w-full max-w-4xl flex items-center justify-between mb-3 px-2">
+      <header className="w-full max-w-6xl flex items-center justify-between mb-2.5 px-2 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
-            <Layers className="h-5 w-5" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/30">
+            <Layers className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold tracking-tight text-foreground">
-                Ask <span className="text-blue-600">OLake</span>
+              <h1 className="text-base font-bold tracking-tight text-foreground">
+                Ask <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">OLake</span>
               </h1>
               <Badge variant="brand" className="text-[10px] h-4.5 px-1.5 font-mono">
                 Iceberg Lakehouse
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground hidden sm:block">
-              AI technical documentation & troubleshooting assistant
+            <p className="text-[11px] text-muted-foreground hidden sm:block">
+              Authoritative AI technical documentation & troubleshooting assistant
             </p>
           </div>
         </div>
@@ -44,9 +44,9 @@ export default function Home() {
             href="https://olake.io/docs/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors shadow-2xs"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors shadow-2xs"
           >
-            <BookOpen className="h-3.5 w-3.5 text-blue-600" />
+            <BookOpen className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
             <span>Docs</span>
             <ExternalLink className="h-3 w-3 text-muted-foreground" />
           </a>
@@ -55,7 +55,7 @@ export default function Home() {
             href="https://github.com/datazip-inc/olake"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors shadow-2xs"
           >
             <GithubIcon className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">GitHub</span>
@@ -63,13 +63,13 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Chat Interface */}
-      <section className="w-full max-w-4xl flex-1 flex flex-col min-h-0" style={{ height: "calc(100vh - 120px)" }}>
+      {/* Main Full-Height Chat Interface */}
+      <section className="w-full max-w-6xl flex-1 flex flex-col min-h-0 overflow-hidden">
         <ChatWidget />
       </section>
 
       {/* Subtle Footer */}
-      <footer className="mt-3 text-center text-[11px] text-muted-foreground">
+      <footer className="mt-2 text-center text-[10px] text-muted-foreground/80 shrink-0">
         <span>Grounded on official </span>
         <a
           href="https://olake.io"
