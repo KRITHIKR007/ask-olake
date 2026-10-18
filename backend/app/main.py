@@ -83,6 +83,20 @@ async def health_check():
     )
 
 
+@app.get("/version", tags=["System"])
+@app.get("/api/version", tags=["System"], include_in_schema=False)
+async def get_version():
+    """Version and system metadata endpoint."""
+    return {
+        "version": "1.0.0",
+        "service": "Ask OLake",
+        "description": "AI Documentation & Architecture Assistant for OLake",
+        "status": "ok",
+        "index_loaded": retrieval_engine.is_loaded,
+        "indexed_chunks": retrieval_engine.num_chunks,
+    }
+
+
 @app.post(
     "/ask",
     response_model=AskResponse,
