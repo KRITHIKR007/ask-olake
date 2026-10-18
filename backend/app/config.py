@@ -4,13 +4,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 INDEX_DIR = DATA_DIR / "index"
 DOCS_DIR = DATA_DIR / "docs"
+
+# Load environment variables from backend or root .env
+load_dotenv(BASE_DIR.parent / ".env")
+load_dotenv(BASE_DIR / ".env")
+load_dotenv()
 
 # Ensure directories exist
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -20,8 +23,9 @@ DOCS_DIR.mkdir(parents=True, exist_ok=True)
 # OpenRouter API
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-CHAT_MODEL = os.getenv("CHAT_MODEL", "google/gemini-2.5-flash-preview")
+CHAT_MODEL = os.getenv("CHAT_MODEL", "openrouter/auto")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "google/gemini-embedding-exp")
+EMBEDDING_API_ENABLED = os.getenv("EMBEDDING_API_ENABLED", "false").lower() in ("true", "1")
 
 # Retrieval settings
 TOP_K_RETRIEVAL = int(os.getenv("TOP_K_RETRIEVAL", "10"))

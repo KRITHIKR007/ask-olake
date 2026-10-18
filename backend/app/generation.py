@@ -11,6 +11,7 @@ from app.config import (
     EMBEDDING_MODEL,
     REQUEST_TIMEOUT,
     EMBEDDING_DIMENSION,
+    EMBEDDING_API_ENABLED,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,10 +39,10 @@ IMPORTANT RULES:
 
 async def generate_embeddings(texts: list[str], batch_size: int = 50) -> np.ndarray:
     """Generate embeddings for a list of texts using OpenRouter API.
-    Falls back to simple TF-IDF-like embeddings if API is unavailable.
+    Falls back to deterministic local embeddings if API is unavailable or disabled.
     """
-    if not OPENROUTER_API_KEY:
-        logger.warning("No OPENROUTER_API_KEY set, using fallback embeddings")
+    if not OPENROUTER_API_KEY or not EMBEDDING_API_ENABLED:
+        logger.info("Using local embeddings (EMBEDDING_API_ENABLED=false)")
         return _fallback_embeddings(texts)
 
     all_embeddings = []
@@ -77,7 +78,7 @@ async def generate_embeddings(texts: list[str], batch_size: int = 50) -> np.ndar
 
 async def generate_query_embedding(query: str) -> np.ndarray:
     """Generate embedding for a single query."""
-    if not OPENROUTER_API_KEY:
+    if not OPENROUTER_API_KEY or not EMBEDDING_API_ENABLED:
         return _fallback_embeddings([query])[0]
 
     async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
