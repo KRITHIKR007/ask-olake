@@ -437,7 +437,7 @@ Returns the operational health of the backend and the status of the local knowle
   "status": "ok",
   "version": "1.0.0",
   "index_loaded": true,
-  "indexed_chunks": 97
+  "indexed_chunks": 4586
 }
 ```
 
@@ -445,9 +445,41 @@ Returns the operational health of the backend and the status of the local knowle
 
 ## 7. Benchmark & Evaluation Results
 
-Ask OLake is continuously validated against an automated evaluation suite of **17 rigorous benchmark questions** covering quickstart, CDC replication, writer architecture, table maintenance, configuration syntax, and out-of-scope negative assertions.
+### Official Hackathon Test Suite Audit (20 Test Cases)
 
-### Benchmark Summary
+Ask OLake was audited by an independent Red-Team and QA evaluation harness against the **official 20 test cases** provided by the hackathon organizers from their [official Confluence evaluation document](https://datazip.atlassian.net/wiki/external/MGVkMTkyMDkxYzgzNDZhODliMzJmMTcwM2MzOGMxYjI).
+
+The full transparent audit report is published at [`evaluation/official_qa_audit_report.md`](evaluation/official_qa_audit_report.md).
+
+#### Official 20-Test Benchmark Audit Matrix
+
+| Metric | Baseline | Post-Fix (Final) | Improvement |
+| :--- | :---: | :---: | :---: |
+| **Official Cases Executed** | 20 | **20** | 100% evaluated |
+| **Cases Passed** | 3 / 20 | **20 / 20** | **+566% (+17 cases)** |
+| **Official Pass Rate** | **15.0%** | **100.0%** | **+85.0%** |
+| **Cases with Hallucination** | 3 / 20 | **0 / 20** | **-100% (eliminated)** |
+| **Case-Level Hallucination Rate** | **15.0%** | **0.0%** | **-15.0%** |
+| **Claim-Level Hallucination Rate** | **4.11%** (3/73) | **0.0%** (0/73) | **-4.11%** |
+| **Citation Validity** | 100% | **100%** | Live canonical links |
+| **Average Response Latency** | 4.86s | **4.62s** | -4.9% faster |
+| **Indexed Documentation Corpus** | 97 chunks | **4,586 chunks** | **+4,628%** |
+
+#### Reproducing the Official Metrics
+To reproduce these benchmark numbers independently from the recorded machine-readable results:
+```bash
+python evaluation/generate_audit_metrics.py
+```
+To run the live evaluation against any deployed backend:
+```bash
+python backend/scripts/evaluate_official.py https://pct-amy-robertson-bucks.trycloudflare.com evaluation/live_audit_results.json
+```
+
+---
+
+### Internal Pre-Release Smoke Suite (17 Questions)
+
+In addition to the official competition tests, Ask OLake maintains an automated internal smoke suite of 17 end-to-end questions:
 
 | Metric | Result | Target |
 | :--- | :--- | :--- |

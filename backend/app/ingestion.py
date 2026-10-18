@@ -148,14 +148,25 @@ def chunk_text(text: str, source_title: str, chunk_size: int = CHUNK_SIZE, overl
     current_heading = source_title
     current_size = 0
 
+    def make_chunk_content(heading: str, raw_body: str) -> str:
+        parts = []
+        if source_title:
+            parts.append(f"# {source_title}")
+        if heading and heading != source_title:
+            parts.append(f"## {heading}")
+        if parts:
+            return "\n".join(parts) + "\n\n" + raw_body
+        return raw_body
+
     for line in lines:
         # Detect headings
         heading_match = re.match(r"^(#{1,4})\s+(.+)", line)
         if heading_match:
             # If we have accumulated content, save it as a chunk
             if current_chunk and current_size > 50:
+                raw_body = "\n".join(current_chunk).strip()
                 chunks.append({
-                    "content": "\n".join(current_chunk).strip(),
+                    "content": make_chunk_content(current_heading, raw_body),
                     "section_heading": current_heading,
                 })
                 # Keep overlap
@@ -176,8 +187,9 @@ def chunk_text(text: str, source_title: str, chunk_size: int = CHUNK_SIZE, overl
 
         # Check if chunk is large enough to split
         if current_size >= chunk_size:
+            raw_body = "\n".join(current_chunk).strip()
             chunks.append({
-                "content": "\n".join(current_chunk).strip(),
+                "content": make_chunk_content(current_heading, raw_body),
                 "section_heading": current_heading,
             })
             # Keep overlap
@@ -193,10 +205,10 @@ def chunk_text(text: str, source_title: str, chunk_size: int = CHUNK_SIZE, overl
 
     # Add remaining content
     if current_chunk:
-        content = "\n".join(current_chunk).strip()
-        if content and len(content) > 30:
+        raw_body = "\n".join(current_chunk).strip()
+        if raw_body and len(raw_body) > 30:
             chunks.append({
-                "content": content,
+                "content": make_chunk_content(current_heading, raw_body),
                 "section_heading": current_heading,
             })
 
