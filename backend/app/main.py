@@ -72,6 +72,7 @@ app.add_middleware(
 
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/health", response_model=HealthResponse, tags=["System"], include_in_schema=False)
 async def health_check():
     """Health check endpoint for deployment diagnostics."""
     return HealthResponse(
@@ -93,6 +94,11 @@ async def health_check():
     },
     tags=["Ask"],
     summary="Ask a question about OLake",
+)
+@app.post(
+    "/api/ask",
+    response_model=AskResponse,
+    include_in_schema=False,
 )
 @limiter.limit(RATE_LIMIT)
 async def ask_question(request: Request, body: AskRequest):

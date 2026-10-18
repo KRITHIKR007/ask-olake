@@ -1,6 +1,16 @@
-/** Ask OLake API client */
+/** Ask OLake API client with Vercel service binding support */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+function getBaseUrl(): string {
+  if (typeof window === "undefined") {
+    // Server-side execution (Next.js route handlers, server actions, SSR)
+    // Uses Vercel service binding variable BACKEND_URL, or local fallback
+    return process.env.BACKEND_URL || "http://127.0.0.1:8000";
+  }
+  // Client-side browser execution:
+  // In Vercel services mode, relative paths ("/ask", "/health") route via top-level rewrites
+  // If NEXT_PUBLIC_API_URL is explicitly set (e.g. cross-domain dev), use it
+  return process.env.NEXT_PUBLIC_API_URL || "";
+}
 
 export interface AskResponse {
   answer: string;
@@ -20,7 +30,10 @@ export interface HealthStatus {
 }
 
 export async function askQuestion(question: string): Promise<AskResponse> {
-  const response = await fetch(`${API_URL}/ask`, {
+  const base = getBaseUrl();
+  const url = base ? `${base.replace(/\/+$/, "")}/ask` : "/ask";
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -40,7 +53,10 @@ export async function askQuestion(question: string): Promise<AskResponse> {
 }
 
 export async function checkHealth(): Promise<HealthStatus> {
-  const response = await fetch(`${API_URL}/health`);
+  const base = getBaseUrl();
+  const url = base ? `${base.replace(/\/+$/, "")}/health` : "/health";
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("API is unavailable");
   }
